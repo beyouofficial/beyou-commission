@@ -163,7 +163,6 @@ async function exportToPDF() {
   const totalEkoin    = records.reduce((s, r) => s + (+r.ekoin || 0), 0);
 
   const cardY = 44;
-  const cardW = (pageW - margin * 2 - (cards.length - 1) * 3) / cards.length;
   const cards = [
     { label: 'TOTAL COLLECTED', val: `RM ${totalCollected.toFixed(2)}` },
     { label: 'PROJECT',         val: `RM ${totalProject.toFixed(2)}` },
@@ -171,6 +170,7 @@ async function exportToPDF() {
     { label: 'PRODUCT',         val: `RM ${totalProduct.toFixed(2)}` },
     { label: 'EKOIN MASK',      val: `RM ${totalEkoin.toFixed(2)}` },
   ];
+  const cardW = (pageW - margin * 2 - (cards.length - 1) * 3) / cards.length;
 
   cards.forEach((card, i) => {
     const x = margin + i * (cardW + 3);
