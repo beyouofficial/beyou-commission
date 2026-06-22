@@ -117,10 +117,10 @@ async function exportToPDF() {
 
   const { monthStr, staffName } = getExportTitle();
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-  const pageW = doc.internal.pageSize.getWidth();
-  const pageH = doc.internal.pageSize.getHeight();
+  const pageW = doc.internal.pageSize.getWidth();  // 297mm in landscape
+  const pageH = doc.internal.pageSize.getHeight(); // 210mm in landscape
   const margin = 14;
 
   // ── Header background ──
@@ -211,13 +211,14 @@ async function exportToPDF() {
 
   doc.autoTable({
     startY: tableY,
-    head: [['Date', 'Staff', 'Customer', 'Project', 'Massage', 'Product', 'Collected', 'Ekoin Mask', 'Remarks']],
+    head: [['Date', 'Staff', 'Card No', 'Customer', 'Project', 'Massage', 'Product', 'Collected', 'Ekoin', 'Remarks']],
     body: tableRows,
-    foot: [['', '', 'TOTAL',
+    foot: [['', '', '', 'TOTAL',
       `RM ${totalProject.toFixed(2)}`,
       `RM ${totalMassage.toFixed(2)}`,
       `RM ${totalProduct.toFixed(2)}`,
       `RM ${totalCollected.toFixed(2)}`,
+      `RM ${totalEkoin.toFixed(2)}`,
       ''
     ]],
     margin: { left: margin, right: margin },
@@ -236,15 +237,15 @@ async function exportToPDF() {
     },
     alternateRowStyles: { fillColor: [252, 252, 252] },
     columnStyles: {
-      0: { cellWidth: 14 },
-      1: { cellWidth: 18 },
-      2: { cellWidth: 12, halign: 'center' },
-      3: { cellWidth: 24 },
-      4: { cellWidth: 16, halign: 'right' },
-      5: { cellWidth: 16, halign: 'right' },
-      6: { cellWidth: 16, halign: 'right' },
-      7: { cellWidth: 18, halign: 'right', fontStyle: 'bold' },
-      8: { cellWidth: 14, halign: 'right' },
+      0: { cellWidth: 18 },
+      1: { cellWidth: 24 },
+      2: { cellWidth: 14, halign: 'center' },
+      3: { cellWidth: 34 },
+      4: { cellWidth: 22, halign: 'right' },
+      5: { cellWidth: 22, halign: 'right' },
+      6: { cellWidth: 22, halign: 'right' },
+      7: { cellWidth: 26, halign: 'right', fontStyle: 'bold' },
+      8: { cellWidth: 22, halign: 'right' },
       9: { cellWidth: 'auto' },
     },
     didDrawPage: (data) => {
