@@ -71,7 +71,7 @@ async function exportToExcel() {
 
   const { monthStr, staffName } = getExportTitle();
 
-  const headers = ['Date', 'Staff', 'Card No', 'Customer Name', 'Project (RM)', 'Massage (RM)', 'Product (RM)', 'Amount Collected (RM)', 'Remarks'];
+  const headers = ['Date', 'Staff', 'Card No', 'Customer Name', 'Project (RM)', 'Massage (RM)', 'Product (RM)', 'Amount Collected (RM)', '依克多因面膜 (RM)', 'Remarks'];
   const rows = records.map(r => [
     r.date ? new Date(r.date).toLocaleDateString('en-MY') : '',
     r.staffName, r.cardNo ? String(r.cardNo).padStart(4,'0') : '', r.customerName,
@@ -79,6 +79,7 @@ async function exportToExcel() {
     parseFloat(r.massage)    || 0,
     parseFloat(r.product)    || 0,
     parseFloat(r.amountCollected) || 0,
+    parseFloat(r.ekoin) || 0,
     r.remarks || ''
   ]);
 
@@ -87,11 +88,12 @@ async function exportToExcel() {
     rows.reduce((s, r) => s + r[5], 0),
     rows.reduce((s, r) => s + r[6], 0),
     rows.reduce((s, r) => s + r[7], 0),
+    rows.reduce((s, r) => s + r[8], 0),
     ''
   ];
 
   const ws = XLSX.utils.aoa_to_sheet([headers, ...rows, [], totalsRow]);
-  ws['!cols'] = [{ wch:14 },{ wch:16 },{ wch:10 },{ wch:24 },{ wch:14 },{ wch:14 },{ wch:14 },{ wch:20 },{ wch:24 }];
+  ws['!cols'] = [{ wch:14 },{ wch:16 },{ wch:10 },{ wch:24 },{ wch:14 },{ wch:14 },{ wch:14 },{ wch:20 },{ wch:18 },{ wch:24 }];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, monthStr.substring(0, 31));
@@ -158,6 +160,7 @@ async function exportToPDF() {
   const totalProject = records.reduce((s, r) => s + (+r.project || 0), 0);
   const totalMassage = records.reduce((s, r) => s + (+r.massage || 0), 0);
   const totalProduct = records.reduce((s, r) => s + (+r.product || 0), 0);
+  const totalEkoin    = records.reduce((s, r) => s + (+r.ekoin || 0), 0);
 
   const cardY = 44;
   const cardW = (pageW - margin * 2 - 9) / 4;
@@ -200,12 +203,13 @@ async function exportToPDF() {
     `RM ${(+r.massage || 0).toFixed(2)}`,
     `RM ${(+r.product || 0).toFixed(2)}`,
     `RM ${(+r.amountCollected || 0).toFixed(2)}`,
+    `RM ${(+r.ekoin || 0).toFixed(2)}`,
     r.remarks || ''
   ]);
 
   doc.autoTable({
     startY: tableY,
-    head: [['Date', 'Staff', 'Customer', 'Project', 'Massage', 'Product', 'Total', 'Remarks']],
+    head: [['Date', 'Staff', 'Customer', 'Project', 'Massage', 'Product', 'Collected', '依克多因', 'Remarks']],
     body: tableRows,
     foot: [['', '', 'TOTAL',
       `RM ${totalProject.toFixed(2)}`,
@@ -236,8 +240,9 @@ async function exportToPDF() {
       3: { cellWidth: 20, halign: 'right' },
       4: { cellWidth: 20, halign: 'right' },
       5: { cellWidth: 20, halign: 'right' },
-      6: { cellWidth: 22, halign: 'right', fontStyle: 'bold' },
-      7: { cellWidth: 'auto' },
+      6: { cellWidth: 20, halign: 'right', fontStyle: 'bold' },
+      7: { cellWidth: 16, halign: 'right' },
+      8: { cellWidth: 'auto' },
     },
     didDrawPage: (data) => {
       // Footer on each page

@@ -110,6 +110,7 @@ function recordCard(r) {
         <div class="amount-item"><span class="amount-label">Massage</span><span class="amount-val">${formatRM(r.massage)}</span></div>
         <div class="amount-item"><span class="amount-label">Product</span><span class="amount-val">${formatRM(r.product)}</span></div>
         <div class="amount-item"><span class="amount-label">Collected</span><span class="amount-val collected-val">${formatRM(r.amountCollected)}</span></div>
+        ${+r.ekoin > 0 ? `<div class="amount-item"><span class="amount-label">依克多因</span><span class="amount-val">${formatRM(r.ekoin)}</span></div>` : ''}
       </div>
       ${r.remarks ? `<div class="record-remarks">${r.remarks}</div>` : ''}
       <div class="record-actions">${editBtn}${deleteBtn}${lockBadge}<span style="flex:1"></span></div>
@@ -165,6 +166,10 @@ function openEditRecord(recordId) {
         <input type="number" id="edit-total" class="field-input" value="${r.amountCollected}" inputmode="decimal" />
       </div>
     </div>
+    <div class="field-group">
+      <label class="field-label">依克多因面膜 (RM)</label>
+      <input type="number" id="edit-ekoin" class="field-input" value="${r.ekoin || 0}" inputmode="decimal" />
+    </div>
 
     <div class="field-group">
       <label class="field-label">Remarks</label>
@@ -193,6 +198,7 @@ async function saveEditRecord() {
     massage:     parseFloat(document.getElementById('edit-massage').value) || 0,
     product:     parseFloat(document.getElementById('edit-product').value) || 0,
     amountCollected: parseFloat(document.getElementById('edit-total').value) || 0,
+    ekoin:       parseFloat(document.getElementById('edit-ekoin').value) || 0,
     remarks:     document.getElementById('edit-remarks').value.trim(),
   };
   if (!payload.customerName) return showFieldError(errEl, 'Please select a customer.');
@@ -400,6 +406,10 @@ function renderAddTab(main) {
         </div>
       </div>
 
+      <div class="field-group">
+        <label class="field-label">依克多因面膜 (RM)</label>
+        <input type="number" id="add-ekoin" class="field-input" placeholder="0.00" inputmode="decimal" />
+      </div>
       <hr class="divider" />
       <div class="field-group">
         <label class="field-label">Remarks</label>
@@ -427,6 +437,7 @@ async function submitAddRecord() {
     massage:      parseFloat(document.getElementById('add-massage').value) || 0,
     product:      parseFloat(document.getElementById('add-product').value) || 0,
     amountCollected: parseFloat(document.getElementById('add-total').value) || 0,
+    ekoin:        parseFloat(document.getElementById('add-ekoin').value) || 0,
     remarks:      document.getElementById('add-remarks').value.trim(),
   };
   if (!payload.customerName) return showFieldError(errEl, 'Please select a customer.');
