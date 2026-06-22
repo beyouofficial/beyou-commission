@@ -166,9 +166,9 @@ async function exportToPDF() {
   const cardW = (pageW - margin * 2 - 9) / 4;
   const cards = [
     { label: 'TOTAL COLLECTED', val: `RM ${totalCollected.toFixed(2)}` },
-    { label: 'PROJECT',       val: `RM ${totalProject.toFixed(2)}` },
-    { label: 'MASSAGE',       val: `RM ${totalMassage.toFixed(2)}` },
-    { label: 'PRODUCT',       val: `RM ${totalProduct.toFixed(2)}` },
+    { label: 'PROJECT',         val: `RM ${totalProject.toFixed(2)}` },
+    { label: 'MASSAGE',         val: `RM ${totalMassage.toFixed(2)}` },
+    { label: 'PRODUCT',         val: `RM ${totalProduct.toFixed(2)}` },
   ];
 
   cards.forEach((card, i) => {
@@ -209,7 +209,7 @@ async function exportToPDF() {
 
   doc.autoTable({
     startY: tableY,
-    head: [['Date', 'Staff', 'Customer', 'Project', 'Massage', 'Product', 'Collected', '依克多因', 'Remarks']],
+    head: [['Date', 'Staff', 'Customer', 'Project', 'Massage', 'Product', 'Collected', 'Ekoin Mask', 'Remarks']],
     body: tableRows,
     foot: [['', '', 'TOTAL',
       `RM ${totalProject.toFixed(2)}`,
