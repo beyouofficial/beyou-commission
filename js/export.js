@@ -93,7 +93,7 @@ async function exportToExcel() {
   ];
 
   const ws = XLSX.utils.aoa_to_sheet([headers, ...rows, [], totalsRow]);
-  ws['!cols'] = [{ wch:14 },{ wch:16 },{ wch:10 },{ wch:24 },{ wch:14 },{ wch:14 },{ wch:14 },{ wch:20 },{ wch:18 },{ wch:24 }];
+  ws['!cols'] = [{ wch:12 },{ wch:16 },{ wch:8  },{ wch:22 },{ wch:14 },{ wch:14 },{ wch:14 },{ wch:20 },{ wch:16 },{ wch:24 }];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, monthStr.substring(0, 31));
@@ -163,12 +163,13 @@ async function exportToPDF() {
   const totalEkoin    = records.reduce((s, r) => s + (+r.ekoin || 0), 0);
 
   const cardY = 44;
-  const cardW = (pageW - margin * 2 - 9) / 4;
+  const cardW = (pageW - margin * 2 - (cards.length - 1) * 3) / cards.length;
   const cards = [
     { label: 'TOTAL COLLECTED', val: `RM ${totalCollected.toFixed(2)}` },
     { label: 'PROJECT',         val: `RM ${totalProject.toFixed(2)}` },
     { label: 'MASSAGE',         val: `RM ${totalMassage.toFixed(2)}` },
     { label: 'PRODUCT',         val: `RM ${totalProduct.toFixed(2)}` },
+    { label: 'EKOIN MASK',      val: `RM ${totalEkoin.toFixed(2)}` },
   ];
 
   cards.forEach((card, i) => {
@@ -198,7 +199,8 @@ async function exportToPDF() {
   const tableRows = records.map(r => [
     r.date ? new Date(r.date).toLocaleDateString('en-MY', { day:'2-digit', month:'short' }) : '',
     r.staffName || '',
-    r.cardNo ? `${String(r.cardNo).padStart(4,'0')} — ${r.customerName}` : (r.customerName || ''),
+    r.cardNo ? String(r.cardNo).padStart(4,'0') : '',
+    r.customerName || '',
     `RM ${(+r.project || 0).toFixed(2)}`,
     `RM ${(+r.massage || 0).toFixed(2)}`,
     `RM ${(+r.product || 0).toFixed(2)}`,
@@ -234,15 +236,16 @@ async function exportToPDF() {
     },
     alternateRowStyles: { fillColor: [252, 252, 252] },
     columnStyles: {
-      0: { cellWidth: 16 },
-      1: { cellWidth: 22 },
-      2: { cellWidth: 30 },
-      3: { cellWidth: 20, halign: 'right' },
-      4: { cellWidth: 20, halign: 'right' },
-      5: { cellWidth: 20, halign: 'right' },
-      6: { cellWidth: 20, halign: 'right', fontStyle: 'bold' },
-      7: { cellWidth: 16, halign: 'right' },
-      8: { cellWidth: 'auto' },
+      0: { cellWidth: 14 },
+      1: { cellWidth: 18 },
+      2: { cellWidth: 12, halign: 'center' },
+      3: { cellWidth: 24 },
+      4: { cellWidth: 16, halign: 'right' },
+      5: { cellWidth: 16, halign: 'right' },
+      6: { cellWidth: 16, halign: 'right' },
+      7: { cellWidth: 18, halign: 'right', fontStyle: 'bold' },
+      8: { cellWidth: 14, halign: 'right' },
+      9: { cellWidth: 'auto' },
     },
     didDrawPage: (data) => {
       // Footer on each page
