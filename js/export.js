@@ -107,166 +107,183 @@ async function exportToExcel() {
 // ═══════════════════════════════════════════════
 // PDF EXPORT
 // ═══════════════════════════════════════════════
+// ─── Load html2canvas lazily ──────────────────
+function loadHtml2Canvas() {
+  return new Promise((resolve, reject) => {
+    if (window.html2canvas) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
 async function exportToPDF() {
   showToast('Preparing PDF…');
-  try { await loadJsPDF(); }
-  catch (e) { showToast('Could not load PDF library.', 'error'); return; }
+
+  try {
+    await loadJsPDF();
+    await loadHtml2Canvas();
+  } catch(e) {
+    showToast('Could not load PDF library.', 'error');
+    return;
+  }
 
   const records = await fetchExportRecords();
   if (!records.length) { showToast('No records to export.', 'error'); return; }
 
   const { monthStr, staffName } = getExportTitle();
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-  const pageW = doc.internal.pageSize.getWidth();  // 297mm in landscape
-  const pageH = doc.internal.pageSize.getHeight(); // 210mm in landscape
-  const margin = 14;
+  // Totals
+  const totalCollected = records.reduce((s,r) => s + (+r.amountCollected||0), 0);
+  const totalProject   = records.reduce((s,r) => s + (+r.project||0), 0);
+  const totalMassage   = records.reduce((s,r) => s + (+r.massage||0), 0);
+  const totalProduct   = records.reduce((s,r) => s + (+r.product||0), 0);
+  const totalEkoin     = records.reduce((s,r) => s + (+r.ekoin||0), 0);
 
-  // ── Header background ──
-  doc.setFillColor(26, 26, 26);
-  doc.rect(0, 0, pageW, 38, 'F');
+  const genDate = new Date().toLocaleDateString('en-MY', {day:'2-digit', month:'short', year:'numeric'});
+  const periodLabel = staffName ? `${staffName} — ${monthStr}` : monthStr;
 
-  // ── BE logo box ──
-  doc.setDrawColor(255, 255, 255);
-  doc.setLineWidth(0.4);
-  doc.rect(margin, 8, 18, 18);
-  doc.setDrawColor(180, 180, 180);
-  doc.setLineWidth(0.2);
-  doc.rect(margin + 1.5, 9.5, 15, 15);
-  doc.setTextColor(255, 255, 255);
-  doc.setFont('times', 'normal');
-  doc.setFontSize(10);
-  doc.text('BE', margin + 9, 19.5, { align: 'center' });
+  // Build off-screen HTML with full Chinese support
+  const container = document.createElement('div');
+  container.style.cssText = `
+    position:fixed; left:-9999px; top:0;
+    width:1050px; background:#fff;
+    font-family:'Inter',Arial,sans-serif;
+    font-size:11px; color:#1a1a1a;
+    padding:0;
+  `;
 
-  // ── Title ──
-  doc.setFont('times', 'normal');
-  doc.setFontSize(14);
-  doc.setTextColor(255, 255, 255);
-  doc.text('BE YOU SKIN MANAGEMENT', margin + 24, 16);
-  doc.setFontSize(8);
-  doc.setTextColor(200, 200, 200);
-  doc.setFont('helvetica', 'normal');
-  doc.text('COMMISSION TRACKER', margin + 24, 22);
+  container.innerHTML = `
+    <!-- Header -->
+    <div style="background:#1a1a1a;padding:20px 28px;display:flex;align-items:center;gap:20px">
+      <div style="width:52px;height:52px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <div style="position:absolute;width:46px;height:46px;border:1px solid #aaa"></div>
+        <span style="font-family:Georgia,serif;font-size:16px;color:#fff;letter-spacing:0.1em;position:relative">BE</span>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:16px;font-weight:600;color:#fff;letter-spacing:0.1em">BE YOU SKIN MANAGEMENT</div>
+        <div style="font-size:10px;color:#ccc;letter-spacing:0.1em;margin-top:3px">COMMISSION TRACKER</div>
+        <div style="font-size:10px;color:#aaa;margin-top:4px">Period: ${periodLabel}</div>
+      </div>
+      <div style="font-size:10px;color:#aaa;text-align:right">Generated: ${genDate}</div>
+    </div>
 
-  // ── Period & generated date ──
-  doc.setFontSize(7.5);
-  doc.setTextColor(160, 160, 160);
-  doc.text(`Period: ${staffName ? staffName + ' — ' : ''}${monthStr}`, margin + 24, 29);
-  doc.text(`Generated: ${new Date().toLocaleDateString('en-MY', { day:'2-digit', month:'short', year:'numeric' })}`, pageW - margin, 29, { align: 'right' });
+    <!-- Summary cards -->
+    <div style="display:flex;gap:0;border-bottom:1px solid #eee">
+      ${[
+        ['TOTAL COLLECTED', totalCollected, true],
+        ['PROJECT', totalProject, false],
+        ['MASSAGE', totalMassage, false],
+        ['PRODUCT', totalProduct, false],
+        ['依克多因面膜', totalEkoin, false],
+      ].map(([label, val, accent]) => `
+        <div style="flex:1;padding:14px 16px;border-right:1px solid #eee;${accent?'border-left:3px solid #1a1a1a':''}">
+          <div style="font-size:18px;font-weight:300;font-family:Georgia,serif">RM ${val.toFixed(2)}</div>
+          <div style="font-size:9px;letter-spacing:0.12em;color:#888;margin-top:3px">${label}</div>
+        </div>`).join('')}
+    </div>
 
-  // ── Summary cards ──
-  const totalCollected = records.reduce((s, r) => s + (+r.amountCollected || 0), 0);
-  const totalProject = records.reduce((s, r) => s + (+r.project || 0), 0);
-  const totalMassage = records.reduce((s, r) => s + (+r.massage || 0), 0);
-  const totalProduct = records.reduce((s, r) => s + (+r.product || 0), 0);
-  const totalEkoin    = records.reduce((s, r) => s + (+r.ekoin || 0), 0);
+    <!-- Table -->
+    <table style="width:100%;border-collapse:collapse;font-size:10px">
+      <thead>
+        <tr style="background:#1a1a1a;color:#fff">
+          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:60px">Date</th>
+          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:80px">Staff</th>
+          <th style="padding:8px 10px;text-align:center;font-weight:500;letter-spacing:0.06em;width:50px">Card No</th>
+          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em">Customer</th>
+          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:70px">Project</th>
+          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:70px">Massage</th>
+          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:70px">Product</th>
+          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:80px">Collected</th>
+          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:80px">依克多因面膜</th>
+          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em">Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${records.map((r, i) => `
+          <tr style="background:${i%2===0?'#fff':'#f8f8f8'};border-bottom:1px solid #eee">
+            <td style="padding:7px 10px">${r.date ? new Date(r.date).toLocaleDateString('en-MY',{day:'2-digit',month:'short'}) : ''}</td>
+            <td style="padding:7px 10px">${r.staffName||''}</td>
+            <td style="padding:7px 10px;text-align:center">${r.cardNo ? String(r.cardNo).padStart(4,'0') : ''}</td>
+            <td style="padding:7px 10px">${r.customerName||''}</td>
+            <td style="padding:7px 10px;text-align:right">RM ${(+r.project||0).toFixed(2)}</td>
+            <td style="padding:7px 10px;text-align:right">RM ${(+r.massage||0).toFixed(2)}</td>
+            <td style="padding:7px 10px;text-align:right">RM ${(+r.product||0).toFixed(2)}</td>
+            <td style="padding:7px 10px;text-align:right;font-weight:600">RM ${(+r.amountCollected||0).toFixed(2)}</td>
+            <td style="padding:7px 10px;text-align:right">RM ${(+r.ekoin||0).toFixed(2)}</td>
+            <td style="padding:7px 10px;color:#666">${r.remarks||''}</td>
+          </tr>`).join('')}
+        <!-- Totals row -->
+        <tr style="background:#f0f0f0;border-top:2px solid #1a1a1a;font-weight:700">
+          <td style="padding:8px 10px" colspan="4">TOTAL</td>
+          <td style="padding:8px 10px;text-align:right">RM ${totalProject.toFixed(2)}</td>
+          <td style="padding:8px 10px;text-align:right">RM ${totalMassage.toFixed(2)}</td>
+          <td style="padding:8px 10px;text-align:right">RM ${totalProduct.toFixed(2)}</td>
+          <td style="padding:8px 10px;text-align:right">RM ${totalCollected.toFixed(2)}</td>
+          <td style="padding:8px 10px;text-align:right">RM ${totalEkoin.toFixed(2)}</td>
+          <td style="padding:8px 10px"></td>
+        </tr>
+      </tbody>
+    </table>
 
-  const cardY = 44;
-  const cards = [
-    { label: 'TOTAL COLLECTED', val: `RM ${totalCollected.toFixed(2)}` },
-    { label: 'PROJECT',         val: `RM ${totalProject.toFixed(2)}` },
-    { label: 'MASSAGE',         val: `RM ${totalMassage.toFixed(2)}` },
-    { label: 'PRODUCT',         val: `RM ${totalProduct.toFixed(2)}` },
-    { label: 'EKOIN MASK',      val: `RM ${totalEkoin.toFixed(2)}` },
-  ];
-  const cardW = (pageW - margin * 2 - (cards.length - 1) * 3) / cards.length;
+    <!-- Footer -->
+    <div style="padding:10px 28px;border-top:1px solid #eee;display:flex;justify-content:space-between;color:#aaa;font-size:9px;letter-spacing:0.06em">
+      <span>BE YOU SKIN MANAGEMENT — CONFIDENTIAL</span>
+      <span>${periodLabel}</span>
+    </div>
+  `;
 
-  cards.forEach((card, i) => {
-    const x = margin + i * (cardW + 3);
-    doc.setFillColor(248, 248, 248);
-    doc.setDrawColor(220, 220, 220);
-    doc.setLineWidth(0.2);
-    doc.rect(x, cardY, cardW, 18, 'FD');
-    // left accent on first card
-    if (i === 0) {
-      doc.setFillColor(26, 26, 26);
-      doc.rect(x, cardY, 1.5, 18, 'F');
+  document.body.appendChild(container);
+
+  try {
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const { jsPDF } = window.jspdf;
+
+    // A4 landscape
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const pdfH = pdf.internal.pageSize.getHeight();
+
+    const imgW = canvas.width;
+    const imgH = canvas.height;
+    const ratio = pdfW / imgW;
+    const scaledH = imgH * ratio;
+
+    // If content fits one page
+    if (scaledH <= pdfH) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, scaledH);
+    } else {
+      // Multi-page — slice canvas
+      let yOffset = 0;
+      const pageHeightPx = pdfH / ratio;
+      while (yOffset < imgH) {
+        const sliceH = Math.min(pageHeightPx, imgH - yOffset);
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = imgW;
+        pageCanvas.height = sliceH;
+        const ctx = pageCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, -yOffset);
+        const pageImg = pageCanvas.toDataURL('image/jpeg', 0.95);
+        if (yOffset > 0) pdf.addPage();
+        pdf.addImage(pageImg, 'JPEG', 0, 0, pdfW, sliceH * ratio);
+        yOffset += pageHeightPx;
+      }
     }
-    doc.setFont('times', 'normal');
-    doc.setFontSize(12);
-    doc.setTextColor(26, 26, 26);
-    doc.text(card.val, x + cardW / 2, cardY + 10, { align: 'center' });
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6.5);
-    doc.setTextColor(140, 140, 140);
-    doc.text(card.label, x + cardW / 2, cardY + 15, { align: 'center' });
-  });
 
-  // ── Table ──
-  const tableY = cardY + 24;
+    const suffix = monthStr !== 'All Records' ? `_${monthStr.replace(' ', '_')}` : '';
+    const staffSuffix = staffName ? `_${staffName.replace(/\s/g, '_')}` : '';
+    pdf.save(`BeYou_Commission${staffSuffix}${suffix}.pdf`);
+    showToast('PDF downloaded!', 'success');
 
-  const tableRows = records.map(r => [
-    r.date ? new Date(r.date).toLocaleDateString('en-MY', { day:'2-digit', month:'short' }) : '',
-    r.staffName || '',
-    r.cardNo ? String(r.cardNo).padStart(4,'0') : '',
-    r.customerName || '',
-    `RM ${(+r.project || 0).toFixed(2)}`,
-    `RM ${(+r.massage || 0).toFixed(2)}`,
-    `RM ${(+r.product || 0).toFixed(2)}`,
-    `RM ${(+r.amountCollected || 0).toFixed(2)}`,
-    `RM ${(+r.ekoin || 0).toFixed(2)}`,
-    r.remarks || ''
-  ]);
-
-  doc.autoTable({
-    startY: tableY,
-    head: [['Date', 'Staff', 'Card No', 'Customer', 'Project', 'Massage', 'Product', 'Collected', 'Ekoin', 'Remarks']],
-    body: tableRows,
-    foot: [['', '', '', 'TOTAL',
-      `RM ${totalProject.toFixed(2)}`,
-      `RM ${totalMassage.toFixed(2)}`,
-      `RM ${totalProduct.toFixed(2)}`,
-      `RM ${totalCollected.toFixed(2)}`,
-      `RM ${totalEkoin.toFixed(2)}`,
-      ''
-    ]],
-    margin: { left: margin, right: margin },
-    styles: {
-      font: 'helvetica', fontSize: 7.5,
-      cellPadding: 3, textColor: [42, 42, 42],
-      lineColor: [230, 230, 230], lineWidth: 0.2,
-    },
-    headStyles: {
-      fillColor: [26, 26, 26], textColor: [255, 255, 255],
-      fontStyle: 'normal', fontSize: 7, letterSpacing: 0.5,
-    },
-    footStyles: {
-      fillColor: [248, 248, 248], textColor: [26, 26, 26],
-      fontStyle: 'bold', fontSize: 7.5,
-    },
-    alternateRowStyles: { fillColor: [252, 252, 252] },
-    columnStyles: {
-      0: { cellWidth: 18 },
-      1: { cellWidth: 24 },
-      2: { cellWidth: 14, halign: 'center' },
-      3: { cellWidth: 34 },
-      4: { cellWidth: 22, halign: 'right' },
-      5: { cellWidth: 22, halign: 'right' },
-      6: { cellWidth: 22, halign: 'right' },
-      7: { cellWidth: 26, halign: 'right', fontStyle: 'bold' },
-      8: { cellWidth: 22, halign: 'right' },
-      9: { cellWidth: 'auto' },
-    },
-    didDrawPage: (data) => {
-      // Footer on each page
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7);
-      doc.setTextColor(180, 180, 180);
-      doc.text(
-        `Be You Skin Management — Confidential`,
-        margin, pageH - 8
-      );
-      doc.text(
-        `Page ${data.pageNumber}`,
-        pageW - margin, pageH - 8, { align: 'right' }
-      );
-    }
-  });
-
-  // ── Save ──
-  const suffix = monthStr !== 'All Records' ? `_${monthStr.replace(' ', '_')}` : '';
-  const staffSuffix = staffName ? `_${staffName.replace(/\s/g, '_')}` : '';
-  doc.save(`BeYou_Commission${staffSuffix}${suffix}.pdf`);
-  showToast('PDF downloaded!', 'success');
+  } finally {
+    document.body.removeChild(container);
+  }
 }
