@@ -111,6 +111,7 @@ function recordCard(r) {
         <div class="amount-item"><span class="amount-label">Product</span><span class="amount-val">${formatRM(r.product)}</span></div>
         <div class="amount-item"><span class="amount-label">Collected</span><span class="amount-val collected-val">${formatRM(r.amountCollected)}</span></div>
         ${+r.ekoin > 0 ? `<div class="amount-item"><span class="amount-label">依克多因</span><span class="amount-val">${formatRM(r.ekoin)}</span></div>` : ''}
+        ${+r.injection > 0 ? `<div class="amount-item"><span class="amount-label">针剂</span><span class="amount-val">${formatRM(r.injection)}</span></div>` : ''}
       </div>
       ${r.remarks ? `<div class="record-remarks">${r.remarks}</div>` : ''}
       <div class="record-actions">${editBtn}${deleteBtn}${lockBadge}<span style="flex:1"></span></div>
@@ -166,9 +167,15 @@ function openEditRecord(recordId) {
         <input type="number" id="edit-total" class="field-input" value="${r.amountCollected}" inputmode="decimal" />
       </div>
     </div>
-    <div class="field-group">
-      <label class="field-label">依克多因面膜 (RM)</label>
-      <input type="number" id="edit-ekoin" class="field-input" value="${r.ekoin || 0}" inputmode="decimal" />
+    <div class="amount-row">
+      <div class="field-group">
+        <label class="field-label">依克多因面膜 (RM)</label>
+        <input type="number" id="edit-ekoin" class="field-input" value="${r.ekoin || 0}" inputmode="decimal" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">针剂 Injection (RM)</label>
+        <input type="number" id="edit-injection" class="field-input" value="${r.injection || 0}" inputmode="decimal" />
+      </div>
     </div>
 
     <div class="field-group">
@@ -199,6 +206,7 @@ async function saveEditRecord() {
     product:     parseFloat(document.getElementById('edit-product').value) || 0,
     amountCollected: parseFloat(document.getElementById('edit-total').value) || 0,
     ekoin:       parseFloat(document.getElementById('edit-ekoin').value) || 0,
+    injection:   parseFloat(document.getElementById('edit-injection').value) || 0,
     remarks:     document.getElementById('edit-remarks').value.trim(),
   };
   if (!payload.customerName) return showFieldError(errEl, 'Please select a customer.');
@@ -406,9 +414,15 @@ function renderAddTab(main) {
         </div>
       </div>
 
-      <div class="field-group">
-        <label class="field-label">依克多因面膜 (RM)</label>
-        <input type="number" id="add-ekoin" class="field-input" placeholder="0.00" inputmode="decimal" />
+      <div class="amount-row">
+        <div class="field-group">
+          <label class="field-label">依克多因面膜 (RM)</label>
+          <input type="number" id="add-ekoin" class="field-input" placeholder="0.00" inputmode="decimal" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">针剂 Injection (RM)</label>
+          <input type="number" id="add-injection" class="field-input" placeholder="0.00" inputmode="decimal" />
+        </div>
       </div>
       <hr class="divider" />
       <div class="field-group">
@@ -438,6 +452,7 @@ async function submitAddRecord() {
     product:      parseFloat(document.getElementById('add-product').value) || 0,
     amountCollected: parseFloat(document.getElementById('add-total').value) || 0,
     ekoin:        parseFloat(document.getElementById('add-ekoin').value) || 0,
+    injection:    parseFloat(document.getElementById('add-injection').value) || 0,
     remarks:      document.getElementById('add-remarks').value.trim(),
   };
   if (!payload.customerName) return showFieldError(errEl, 'Please select a customer.');
@@ -532,7 +547,9 @@ async function loadDashContent(month, year, staffId, todayMode) {
       return d === todayStr;
     });
   }
-  const totalCollected = records.reduce((s,r) => s + (+r.amountCollected||0), 0);
+  const totalCollected  = records.reduce((s,r) => s + (+r.amountCollected||0), 0);
+  const totalEkoin      = records.reduce((s,r) => s + (+r.ekoin||0), 0);
+  const totalInjection  = records.reduce((s,r) => s + (+r.injection||0), 0);
   const totalProject = records.reduce((s,r) => s + (+r.project||0), 0);
   const totalMassage = records.reduce((s,r) => s + (+r.massage||0), 0);
   const totalProduct = records.reduce((s,r) => s + (+r.product||0), 0);
@@ -566,14 +583,12 @@ async function loadDashContent(month, year, staffId, todayMode) {
   dashEl.innerHTML = `
     <p style="font-size:var(--fs-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--silver-deep);margin-bottom:12px">${filterLabel}</p>
     <div class="summary-grid">
-      <div class="summary-card full">
-        <div class="summary-num">${formatRM(totalCollected)}</div>
-        <div class="summary-label">Total Collected</div>
-      </div>
       <div class="summary-card"><div class="summary-num">${formatRM(totalProject)}</div><div class="summary-label">Project</div></div>
       <div class="summary-card"><div class="summary-num">${formatRM(totalMassage)}</div><div class="summary-label">Massage</div></div>
       <div class="summary-card"><div class="summary-num">${formatRM(totalProduct)}</div><div class="summary-label">Product</div></div>
-      <div class="summary-card"><div class="summary-num">${records.length}</div><div class="summary-label">Entries</div></div>
+      <div class="summary-card"><div class="summary-num">${formatRM(totalCollected)}</div><div class="summary-label">Total Collected</div></div>
+      <div class="summary-card"><div class="summary-num">${formatRM(totalEkoin)}</div><div class="summary-label">依克多因面膜</div></div>
+      <div class="summary-card"><div class="summary-num">${formatRM(totalInjection)}</div><div class="summary-label">针剂 Injection</div></div>
     </div>
     ${breakdownHtml}`;
 }

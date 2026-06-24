@@ -71,7 +71,7 @@ async function exportToExcel() {
 
   const { monthStr, staffName } = getExportTitle();
 
-  const headers = ['Date', 'Staff', 'Card No', 'Customer Name', 'Project (RM)', 'Massage (RM)', 'Product (RM)', 'Amount Collected (RM)', '依克多因面膜 (RM)', 'Remarks'];
+  const headers = ['Date', 'Staff', 'Card No', 'Customer Name', 'Project (RM)', 'Massage (RM)', 'Product (RM)', 'Amount Collected (RM)', '依克多因面膜 (RM)', '针剂 Injection (RM)', 'Remarks'];
   const rows = records.map(r => [
     r.date ? new Date(r.date).toLocaleDateString('en-MY') : '',
     r.staffName, r.cardNo ? String(r.cardNo).padStart(4,'0') : '', r.customerName,
@@ -80,6 +80,7 @@ async function exportToExcel() {
     parseFloat(r.product)    || 0,
     parseFloat(r.amountCollected) || 0,
     parseFloat(r.ekoin) || 0,
+    parseFloat(r.injection) || 0,
     r.remarks || ''
   ]);
 
@@ -89,11 +90,12 @@ async function exportToExcel() {
     rows.reduce((s, r) => s + r[6], 0),
     rows.reduce((s, r) => s + r[7], 0),
     rows.reduce((s, r) => s + r[8], 0),
+    rows.reduce((s, r) => s + r[9], 0),
     ''
   ];
 
   const ws = XLSX.utils.aoa_to_sheet([headers, ...rows, [], totalsRow]);
-  ws['!cols'] = [{ wch:12 },{ wch:16 },{ wch:8  },{ wch:22 },{ wch:14 },{ wch:14 },{ wch:14 },{ wch:20 },{ wch:16 },{ wch:24 }];
+  ws['!cols'] = [{ wch:12 },{ wch:16 },{ wch:8 },{ wch:22 },{ wch:14 },{ wch:14 },{ wch:14 },{ wch:20 },{ wch:16 },{ wch:16 },{ wch:24 }];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, monthStr.substring(0, 31));
@@ -139,7 +141,8 @@ async function exportToPDF() {
   const totalProject   = records.reduce((s,r) => s + (+r.project||0), 0);
   const totalMassage   = records.reduce((s,r) => s + (+r.massage||0), 0);
   const totalProduct   = records.reduce((s,r) => s + (+r.product||0), 0);
-  const totalEkoin     = records.reduce((s,r) => s + (+r.ekoin||0), 0);
+  const totalEkoin      = records.reduce((s,r) => s + (+r.ekoin||0), 0);
+  const totalInjection  = records.reduce((s,r) => s + (+r.injection||0), 0);
 
   const genDate = new Date().toLocaleDateString('en-MY', {day:'2-digit', month:'short', year:'numeric'});
   const periodLabel = staffName ? `${staffName} — ${monthStr}` : monthStr;
@@ -197,6 +200,7 @@ async function exportToPDF() {
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:70px">Product</th>
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:80px">Collected</th>
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:80px">依克多因面膜</th>
+          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:80px">针剂 Injection</th>
           <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em">Remarks</th>
         </tr>
       </thead>
@@ -212,6 +216,7 @@ async function exportToPDF() {
             <td style="padding:7px 10px;text-align:right">RM ${(+r.product||0).toFixed(2)}</td>
             <td style="padding:7px 10px;text-align:right;font-weight:600">RM ${(+r.amountCollected||0).toFixed(2)}</td>
             <td style="padding:7px 10px;text-align:right">RM ${(+r.ekoin||0).toFixed(2)}</td>
+            <td style="padding:7px 10px;text-align:right">RM ${(+r.injection||0).toFixed(2)}</td>
             <td style="padding:7px 10px;color:#666">${r.remarks||''}</td>
           </tr>`).join('')}
         <!-- Totals row -->
@@ -222,6 +227,7 @@ async function exportToPDF() {
           <td style="padding:8px 10px;text-align:right">RM ${totalProduct.toFixed(2)}</td>
           <td style="padding:8px 10px;text-align:right">RM ${totalCollected.toFixed(2)}</td>
           <td style="padding:8px 10px;text-align:right">RM ${totalEkoin.toFixed(2)}</td>
+          <td style="padding:8px 10px;text-align:right">RM ${totalInjection.toFixed(2)}</td>
           <td style="padding:8px 10px"></td>
         </tr>
       </tbody>
@@ -287,3 +293,4 @@ async function exportToPDF() {
     document.body.removeChild(container);
   }
 }
+
