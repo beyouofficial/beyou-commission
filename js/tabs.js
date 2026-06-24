@@ -109,7 +109,7 @@ function recordCard(r) {
         <div class="amount-item"><span class="amount-label">Project</span><span class="amount-val">${formatRM(r.project)}</span></div>
         <div class="amount-item"><span class="amount-label">Massage</span><span class="amount-val">${formatRM(r.massage)}</span></div>
         <div class="amount-item"><span class="amount-label">Product</span><span class="amount-val">${formatRM(r.product)}</span></div>
-        <div class="amount-item"><span class="amount-label">Collected</span><span class="amount-val collected-val">${formatRM(r.amountCollected)}</span></div>
+        <div class="amount-item"><span class="amount-label">Total Sales</span><span class="amount-val collected-val">${formatRM(r.amountCollected)}</span></div>
         ${+r.ekoin > 0 ? `<div class="amount-item"><span class="amount-label">依克多因</span><span class="amount-val">${formatRM(r.ekoin)}</span></div>` : ''}
         ${+r.injection > 0 ? `<div class="amount-item"><span class="amount-label">针剂</span><span class="amount-val">${formatRM(r.injection)}</span></div>` : ''}
       </div>
@@ -586,7 +586,7 @@ async function loadDashContent(month, year, staffId, todayMode) {
       <div class="summary-card"><div class="summary-num">${formatRM(totalProject)}</div><div class="summary-label">Project</div></div>
       <div class="summary-card"><div class="summary-num">${formatRM(totalMassage)}</div><div class="summary-label">Massage</div></div>
       <div class="summary-card"><div class="summary-num">${formatRM(totalProduct)}</div><div class="summary-label">Product</div></div>
-      <div class="summary-card"><div class="summary-num">${formatRM(totalCollected)}</div><div class="summary-label">Total Collected</div></div>
+      <div class="summary-card"><div class="summary-num">${formatRM(totalCollected)}</div><div class="summary-label">Total Sales</div></div>
       <div class="summary-card"><div class="summary-num">${formatRM(totalEkoin)}</div><div class="summary-label">依克多因面膜</div></div>
       <div class="summary-card"><div class="summary-num">${formatRM(totalInjection)}</div><div class="summary-label">针剂 Injection</div></div>
     </div>

@@ -71,7 +71,7 @@ async function exportToExcel() {
 
   const { monthStr, staffName } = getExportTitle();
 
-  const headers = ['Date', 'Staff', 'Card No', 'Customer Name', 'Project (RM)', 'Massage (RM)', 'Product (RM)', 'Amount Collected (RM)', '依克多因面膜 (RM)', '针剂 Injection (RM)', 'Remarks'];
+  const headers = ['Date', 'Staff', 'Card No', 'Customer Name', 'Project (RM)', 'Massage (RM)', 'Product (RM)', 'Total Sales (RM)', '依克多因面膜 (RM)', '针剂 Injection (RM)', 'Remarks'];
   const rows = records.map(r => [
     r.date ? new Date(r.date).toLocaleDateString('en-MY') : '',
     r.staffName, r.cardNo ? String(r.cardNo).padStart(4,'0') : '', r.customerName,
@@ -175,7 +175,7 @@ async function exportToPDF() {
     <!-- Summary cards -->
     <div style="display:flex;gap:0;border-bottom:1px solid #eee">
       ${[
-        ['TOTAL COLLECTED', totalCollected, true],
+        ['TOTAL SALES',     totalCollected, true],
         ['PROJECT', totalProject, false],
         ['MASSAGE', totalMassage, false],
         ['PRODUCT', totalProduct, false],
@@ -194,11 +194,11 @@ async function exportToPDF() {
           <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:60px">Date</th>
           <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:80px">Staff</th>
           <th style="padding:8px 10px;text-align:center;font-weight:500;letter-spacing:0.06em;width:50px">Card No</th>
-          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em">Customer</th>
+          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:100px">Customer</th>
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:70px">Project</th>
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:70px">Massage</th>
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:70px">Product</th>
-          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:80px">Collected</th>
+          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:75px">Total Sales</th>
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:80px">依克多因面膜</th>
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:80px">针剂 Injection</th>
           <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em">Remarks</th>
@@ -221,7 +221,7 @@ async function exportToPDF() {
           </tr>`).join('')}
         <!-- Totals row -->
         <tr style="background:#f0f0f0;border-top:2px solid #1a1a1a;font-weight:700">
-          <td style="padding:8px 10px" colspan="4">TOTAL</td>
+          <td style="padding:8px 10px;font-weight:700" colspan="4">TOTAL</td>
           <td style="padding:8px 10px;text-align:right">RM ${totalProject.toFixed(2)}</td>
           <td style="padding:8px 10px;text-align:right">RM ${totalMassage.toFixed(2)}</td>
           <td style="padding:8px 10px;text-align:right">RM ${totalProduct.toFixed(2)}</td>
