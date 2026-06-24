@@ -191,17 +191,17 @@ async function exportToPDF() {
     <table style="width:100%;border-collapse:collapse;font-size:10px">
       <thead>
         <tr style="background:#1a1a1a;color:#fff">
-          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:60px">Date</th>
-          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:80px">Staff</th>
-          <th style="padding:8px 10px;text-align:center;font-weight:500;letter-spacing:0.06em;width:50px">Card No</th>
-          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:100px">Customer</th>
+          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:52px;white-space:nowrap">Date</th>
+          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:70px;white-space:nowrap">Staff</th>
+          <th style="padding:8px 10px;text-align:center;font-weight:500;letter-spacing:0.06em;width:48px;white-space:nowrap">Card No</th>
+          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;width:90px;white-space:nowrap">Customer</th>
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:70px">Project</th>
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:70px">Massage</th>
           <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:70px">Product</th>
-          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:75px">Total Sales</th>
-          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:80px">依克多因面膜</th>
-          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:80px">针剂 Injection</th>
-          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em">Remarks</th>
+          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:85px;white-space:nowrap">Total Sales</th>
+          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:90px;white-space:nowrap">依克多因面膜</th>
+          <th style="padding:8px 10px;text-align:right;font-weight:500;letter-spacing:0.06em;width:90px;white-space:nowrap">针剂 Injection</th>
+          <th style="padding:8px 10px;text-align:left;font-weight:500;letter-spacing:0.06em;white-space:nowrap">Remarks</th>
         </tr>
       </thead>
       <tbody>

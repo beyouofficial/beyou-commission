@@ -106,10 +106,10 @@ function recordCard(r) {
         <span class="record-date">${formatDate(r.date)}</span>
       </div>
       <div class="record-amounts">
-        <div class="amount-item"><span class="amount-label">Project</span><span class="amount-val">${formatRM(r.project)}</span></div>
-        <div class="amount-item"><span class="amount-label">Massage</span><span class="amount-val">${formatRM(r.massage)}</span></div>
-        <div class="amount-item"><span class="amount-label">Product</span><span class="amount-val">${formatRM(r.product)}</span></div>
-        <div class="amount-item"><span class="amount-label">Total Sales</span><span class="amount-val collected-val">${formatRM(r.amountCollected)}</span></div>
+        ${+r.project > 0 ? `<div class="amount-item"><span class="amount-label">Project</span><span class="amount-val">${formatRM(r.project)}</span></div>` : ''}
+        ${+r.massage > 0 ? `<div class="amount-item"><span class="amount-label">Massage</span><span class="amount-val">${formatRM(r.massage)}</span></div>` : ''}
+        ${+r.product > 0 ? `<div class="amount-item"><span class="amount-label">Product</span><span class="amount-val">${formatRM(r.product)}</span></div>` : ''}
+        ${+r.amountCollected > 0 ? `<div class="amount-item"><span class="amount-label">Total Sales</span><span class="amount-val collected-val">${formatRM(r.amountCollected)}</span></div>` : ''}
         ${+r.ekoin > 0 ? `<div class="amount-item"><span class="amount-label">依克多因</span><span class="amount-val">${formatRM(r.ekoin)}</span></div>` : ''}
         ${+r.injection > 0 ? `<div class="amount-item"><span class="amount-label">针剂</span><span class="amount-val">${formatRM(r.injection)}</span></div>` : ''}
       </div>
