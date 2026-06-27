@@ -521,3 +521,187 @@ textarea.field-input { height: clamp(64px, 18vw, 80px); padding: var(--sp-xs) 12
   margin-top: var(--sp-xs);
 }
 .record-actions .btn { flex-shrink: 0; }
+
+/* ─── VIEW TOGGLE ─────────────────────────────── */
+.view-toggle { display: flex; gap: 4px; }
+.view-btn {
+  width: 32px; height: 32px;
+  background: var(--white); border: 1px solid var(--silver);
+  border-radius: var(--radius-sm); cursor: pointer;
+  font-size: 14px; display: flex; align-items: center; justify-content: center;
+  color: var(--silver-deep); transition: all 0.15s;
+}
+.view-btn.active { background: var(--near-black); color: var(--white); border-color: var(--near-black); }
+
+/* ─── RECORDS TABLE VIEW ──────────────────────── */
+.records-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--light-grey);
+  border-radius: var(--radius-sm);
+}
+.records-table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+  font-size: var(--fs-xs);
+  background: var(--white);
+}
+.records-table thead tr {
+  background: var(--near-black);
+  color: var(--white);
+}
+.records-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 9px;
+  white-space: nowrap;
+}
+.records-table th.num { text-align: right; }
+.records-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--light-grey);
+  color: var(--charcoal);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+.records-table td.num { text-align: right; }
+.records-table td.bold { font-weight: 600; color: var(--near-black); }
+.records-table td.rmk { white-space: normal; min-width: 80px; color: var(--silver-deep); font-style: italic; }
+.records-table td.acts { text-align: center; white-space: nowrap; }
+.records-table tr:last-child td { border-bottom: none; }
+.records-table tr:nth-child(even) { background: var(--off-white); }
+.records-table tr.tbl-locked { opacity: 0.65; }
+
+/* Table action buttons */
+.tbl-btn {
+  width: 26px; height: 26px;
+  border: none; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 13px;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: opacity 0.15s;
+}
+.tbl-btn:active { opacity: 0.7; }
+.tbl-edit { background: var(--light-grey); color: var(--charcoal); }
+.tbl-del  { background: #f5e0de; color: var(--danger); margin-left: 4px; }
+
+/* ─── DATE RANGE FILTER ───────────────────────── */
+.date-filter-inline {
+  flex: 1;
+  min-width: 100px;
+  height: clamp(36px, 10vw, 42px);
+  padding: 0 8px;
+  border: 1px solid var(--silver);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  color: var(--charcoal);
+  background: var(--white);
+  appearance: none;
+}
+.date-filter-inline:focus { border-color: var(--near-black); outline: none; }
+
+.btn-clear-date {
+  width: clamp(32px, 9vw, 38px);
+  height: clamp(36px, 10vw, 42px);
+  border: 1px solid var(--silver);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  color: var(--silver-deep);
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.btn-clear-date:hover { border-color: var(--near-black); color: var(--near-black); }
+.btn-clear-date:active { background: var(--light-grey); }
+
+.today-btn { flex-shrink: 0; }
+
+/* ─── RECORD CARD ACTIONS RIGHT-ALIGNED ──────── */
+.record-actions-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--sp-xs);
+  margin-top: var(--sp-xs);
+}
+
+/* ─── TABLE TOTALS ROW ────────────────────────── */
+.tbl-total-row td {
+  padding: 9px 10px;
+  background: var(--near-black);
+  color: var(--white);
+  border-bottom: none;
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+.tbl-total-row td.num { text-align: right; font-weight: 600; }
+
+/* ─── RECORD CARD TOP RIGHT ───────────────────── */
+.record-top-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+.record-actions-inline {
+  display: flex;
+  gap: var(--sp-xs);
+  align-items: center;
+}
+
+/* ─── CARD ICON BUTTONS ───────────────────────── */
+.card-icon-btn {
+  width: 28px; height: 28px;
+  border: 1px solid var(--silver);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  color: var(--charcoal);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.card-icon-btn:active { opacity: 0.7; }
+.card-icon-del {
+  border-color: #e0b0ad;
+  background: #fdf0ef;
+  color: var(--danger);
+}
+
+/* Fix record-top to vertically center everything */
+.record-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sp-xs);
+}
+.record-top-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+.record-actions-inline {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* ─── RECORD TOP SINGLE ROW ───────────────────── */
+.record-top-right-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
